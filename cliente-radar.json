@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "branding": {
+    "primary": "#EF4444",
+    "background": "#111827",
+    "text": "#FFFFFF",
+    "logoUrl": "https://placehold.co/200x60/EF4444/FFFFFF.png?text=Radar+Hits",
+    "bgImageUrl": "https://placehold.co/1200x800/1F2937/FFFFFF.png?text=Background+Radar",
+    "statusBarStyle": "light",
+    "navigationMode": "dark",
+    "muted": "#9CA3AF",
+    "border": "rgba(255,255,255,0.12)",
+    "card": "#0F172A"
+  },
+  "streams": {
+    "radio": {
+      "primaryUrl": "https://str1.streamhostpg.com.br:8042/stream",
+      "fallbackUrls": ["https://backup.exemplo.com/radar.mp3"],
+      "metadataUrl": "https://api.exemplo.com/radar/now-playing"
+    }
+  },
+  "station": {
+    "name": "Radar Hits",
+    "genre": "Top 40",
+    "logoUrl": "https://placehold.co/150x150/EF4444/FFFFFF.png?text=Radar",
+    "shareUrl": "https://kdsistemasweb.com.br/radar",
+    "partners": [
+      {
+        "imageUrl": "https://placehold.co/300x100/B91C1C/FFFFFF.png?text=Loja+X",
+        "title": "Loja X",
+        "href": "https://x.com"
+      },
+      {
+        "imageUrl": "https://placehold.co/300x100/DC2626/FFFFFF.png?text=Marca+Y",
+        "title": "Marca Y",
+        "href": "https://y.com"
+      }
+    ],
+    "heroImages": [
+      "https://placehold.co/1200x1200/333/FFFFFF.png?text=Banner+Radio+1",
+      "https://placehold.co/1200x600/222/FFFFFF.png?text=Banner+Radio+2"
+    ]
+  },
+  "promos": {
+    "headline": "Radar Ofertas",
+    "items": [
+      {
+        "id": "rad-15",
+        "title": "15% OFF",
+        "image": "https://placehold.co/400x200/EF4444/FFFFFF.png?text=Cupom+Radar",
+        "code": "RAD15",
+        "rulesUrl": "https://placehold.co/200x100/1F2937/FFFFFF.png?text=Regras",
+        "expiresAt": "2025-10-10"
+      }
+    ]
+  },
+  "features": {
+    "enablePictureInPicture": true,
+    "enableMiniPlayer": true,
+    "checkConfigIntervalSec": 900
+  }
+}

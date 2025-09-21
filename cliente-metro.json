@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "branding": {
+    "primary": "#10B981",
+    "background": "#0B1020",
+    "text": "#FFFFFF",
+    "logoUrl": "https://placehold.co/200x60/10B981/0B1020.png?text=Metro+Vibes",
+    "bgImageUrl": "https://placehold.co/1200x800/064E3B/FFFFFF.png?text=Background+Metro",
+    "statusBarStyle": "light",
+    "navigationMode": "dark",
+    "muted": "#9CA3AF",
+    "border": "rgba(255,255,255,0.12)",
+    "card": "#0F172A"
+  },
+  "streams": {
+    "radio": {
+      "primaryUrl": "https://str1.streamhostpg.com.br:8042/stream",
+      "fallbackUrls": ["https://backup.exemplo.com/metro.mp3"],
+      "metadataUrl": "https://api.exemplo.com/metro/now-playing"
+    }
+  },
+  "station": {
+    "name": "Metro Vibes",
+    "genre": "Lo-fi/Chill",
+    "logoUrl": "https://placehold.co/150x150/10B981/0B1020.png?text=Metro",
+    "shareUrl": "https://kdsistemasweb.com.br/metro",
+    "partners": [
+      {
+        "imageUrl": "https://placehold.co/300x100/065F46/FFFFFF.png?text=Cafe+Z",
+        "title": "Café Z",
+        "href": "https://z.com"
+      },
+      {
+        "imageUrl": "https://placehold.co/300x100/047857/FFFFFF.png?text=Studio+Lo-fi",
+        "title": "Studio Lo-fi",
+        "href": "https://studio.com"
+      }
+    ],
+    "heroImages": [
+      "https://placehold.co/1200x1200/333/FFFFFF.png?text=Banner+Radio+1",
+      "https://placehold.co/1200x600/0B1020/10B981.png?text=Banner+Radio+2"
+    ]
+  },
+  "promos": {
+    "headline": "Metro Promos",
+    "items": [
+      {
+        "id": "met-5",
+        "title": "5% OFF",
+        "image": "https://placehold.co/400x200/10B981/0B1020.png?text=Cupom+Metro",
+        "code": "MET5",
+        "rulesUrl": "https://placehold.co/200x100/064E3B/FFFFFF.png?text=Regras",
+        "expiresAt": "2025-10-10"
+      }
+    ]
+  },
+  "features": {
+    "enablePictureInPicture": true,
+    "enableMiniPlayer": true,
+    "checkConfigIntervalSec": 900
+  }
+}

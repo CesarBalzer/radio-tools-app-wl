@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "branding": {
+    "primary": "#7C3AED",
+    "background": "#0B0A10",
+    "text": "#FFFFFF",
+    "logoUrl": "https://placehold.co/200x60/7C3AED/FFFFFF.png?text=Aurora+FM",
+    "bgImageUrl": "https://placehold.co/1200x800/1E1B4B/FFFFFF.png?text=Background+Aurora",
+    "statusBarStyle": "light",
+    "navigationMode": "dark",
+    "muted": "#A3A3A3",
+    "border": "rgba(255,255,255,0.12)",
+    "card": "#111111"
+  },
+  "streams": {
+    "radio": {
+      "primaryUrl": "https://str1.streamhostpg.com.br:8042/stream",
+      "fallbackUrls": ["https://backup.exemplo.com/aurora.mp3"],
+      "metadataUrl": "https://api.exemplo.com/aurora/now-playing"
+    },
+    "video": {
+      "primaryUrl": "https://s1.tvr.ovh/tropicalfm/tropicalfm/playlist.m3u8",
+      "fallbackUrls": []
+    }
+  },
+  "station": {
+    "name": "Aurora FM",
+    "genre": "Pop/EDM",
+    "logoUrl": "https://placehold.co/150x150/7C3AED/FFFFFF.png?text=Aurora",
+    "shareUrl": "https://kdsistemasweb.com.br/aurora",
+    "partners": [
+      {
+        "imageUrl": "https://placehold.co/300x100/4C1D95/FFFFFF.png?text=Patrocinador+Alpha",
+        "title": "Alpha",
+        "href": "https://a.com"
+      },
+      {
+        "imageUrl": "https://placehold.co/300x100/6D28D9/FFFFFF.png?text=Patrocinador+Beta",
+        "title": "Beta",
+        "href": "https://b.com"
+      }
+    ],
+    "heroImages": [
+      "https://placehold.co/1200x1200/333/FFFFFF.png?text=Banner+Radio+1",
+      "https://placehold.co/1200x600/222/FFFFFF.png?text=Banner+Radio+2"
+    ]
+  },
+  "promos": {
+    "headline": "Cupons Aurora",
+    "items": [
+      {
+        "id": "aur-10",
+        "title": "10% OFF Aurora Store",
+        "image": "https://placehold.co/400x200/7C3AED/FFFFFF.png?text=Cupom+Aurora",
+        "code": "AUR10",
+        "rulesUrl": "https://placehold.co/200x100/1E1B4B/FFFFFF.png?text=Regras",
+        "expiresAt": "2025-10-10"
+      }
+    ]
+  },
+  "features": {
+    "enablePictureInPicture": true,
+    "enableMiniPlayer": true,
+    "checkConfigIntervalSec": 900
+  }
+}
