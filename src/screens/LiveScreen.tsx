@@ -49,7 +49,7 @@ export default function LiveScreen() {
           player={player}
           nativeControls
           contentFit="contain"
-          allowsFullscreen
+          fullscreenOptions={{ enable: true }}
           allowsPictureInPicture
         />
       </View>

@@ -4,7 +4,7 @@
     "primary": "#10B981",
     "background": "#0B1020",
     "text": "#FFFFFF",
-    "logoUrl": "https://placehold.co/200x60/10B981/0B1020.png?text=Metro+Vibes",
+    "logoUrl": "https://placehold.co/200x60/FFF/10B981.png?text=Metro+Vibez",
     "bgImageUrl": "https://placehold.co/1200x800/064E3B/FFFFFF.png?text=Background+Metro",
     "statusBarStyle": "light",
     "navigationMode": "dark",
@@ -20,7 +20,7 @@
     }
   },
   "station": {
-    "name": "Metro Vibes",
+    "name": "Metro Vibez",
     "genre": "Lo-fi/Chill",
     "logoUrl": "https://placehold.co/150x150/10B981/0B1020.png?text=Metro",
     "shareUrl": "https://kdsistemasweb.com.br/metro",

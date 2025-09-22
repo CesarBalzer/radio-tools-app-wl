@@ -35,8 +35,8 @@ export default ({config}: ConfigContext): ExpoConfig => ({
 	},
 	extra: {
 		TENANT: 'cliente-aurora', // cliente-radar / cliente-metro
-		// REMOTE_CONFIG_URL_TEMPLATE: 'https://kdsistemasweb.com.br/configs/{tenant}.json',
-		REMOTE_CONFIG_URL_TEMPLATE: './assets/configs/{tenant}.json'
+		REMOTE_CONFIG_URL_TEMPLATE: 'https://kdsistemasweb.com.br/configs/{tenant}.json',
+		// REMOTE_CONFIG_URL_TEMPLATE: './assets/configs/{tenant}.json'
 	},
 	plugins: ['expo-video']
 });
