@@ -2,17 +2,15 @@
 import React, {createContext, useContext, useEffect, useMemo, useState, useCallback, useRef} from 'react';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, {AxiosRequestHeaders} from 'axios';
+import axios from 'axios';
 import type {RemoteConfig} from '../types';
 
-/* ─────────── Defaults mínimos ─────────── */
 const DEFAULT_CONFIG: RemoteConfig = {
 	version: 1,
 	branding: {primary: '#ACF44E', background: '#000000', text: '#FFFFFF'},
 	streams: {radio: {primaryUrl: '', fallbackUrls: []}}
 };
 
-/* Storage keys base */
 const KEY_BASE = 'remote-config-cache';
 const TENANT_KEY = 'remote-config-tenant';
 const ETAG_KEY_BASE = 'remote-config-etag';
@@ -49,11 +47,9 @@ function sanitizeConfig(input: any): RemoteConfig {
 				logoUrl: typeof input?.branding?.logoUrl === 'string' ? input.branding.logoUrl : undefined,
 				bgImageUrl: typeof input?.branding?.bgImageUrl === 'string' ? input.branding.bgImageUrl : undefined,
 
-				// 👇 novos campos (opcionais)
 				statusBarStyle: input?.branding?.statusBarStyle === 'dark' ? 'dark' : input?.branding?.statusBarStyle === 'light' ? 'light' : undefined,
 				navigationMode: input?.branding?.navigationMode === 'light' ? 'light' : input?.branding?.navigationMode === 'dark' ? 'dark' : undefined,
 
-				// overrides de cores opcionais (se quiser total controle do tema)
 				muted: typeof input?.branding?.muted === 'string' ? input.branding.muted : undefined,
 				border: typeof input?.branding?.border === 'string' ? input.branding.border : undefined,
 				card: typeof input?.branding?.card === 'string' ? input.branding.card : undefined
@@ -90,7 +86,6 @@ function sanitizeConfig(input: any): RemoteConfig {
 	}
 }
 
-/* ─────────── Provider ─────────── */
 export function useRemoteConfigProvider() {
 	const [isReady, setIsReady] = useState(false);
 	const [tenant, setTenantState] = useState<string>('default');
@@ -98,7 +93,6 @@ export function useRemoteConfigProvider() {
 	const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined);
 	const firstPaintDoneRef = useRef(false);
 
-	// resolve tenant (AsyncStorage > app.json extra > 'default')
 	useEffect(() => {
 		(async () => {
 			const extra = getExtra();
@@ -114,7 +108,6 @@ export function useRemoteConfigProvider() {
 		if (!url) throw new Error('REMOTE_CONFIG_URL ausente');
 		setCurrentUrl(url);
 
-		// ETag condicional pra economizar e evitar flicker
 		const etagKey = `${ETAG_KEY_BASE}:${t}`;
 		const prevEtag = await AsyncStorage.getItem(etagKey);
 
@@ -154,17 +147,14 @@ export function useRemoteConfigProvider() {
 	}, []);
 
 	const refresh = useCallback(async () => {
-		// usado por UI ou troca de tenant
 		await fetchRemote(tenant);
 	}, [fetchRemote, tenant]);
 
-	// bootstrap: cache-first, fetch-second, com splash
 	useEffect(() => {
 		if (!tenant) return;
 		(async () => {
 			const hadCache = await hydrateFromCache(tenant);
 			if (hadCache && !firstPaintDoneRef.current) {
-				// já podemos liberar a UI com a marca do cliente
 				setIsReady(true);
 				firstPaintDoneRef.current = true;
 			}

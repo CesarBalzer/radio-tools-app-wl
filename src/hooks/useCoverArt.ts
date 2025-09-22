@@ -2,10 +2,7 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 
-/**
- * Busca a capa do álbum (cover art) no iTunes Search API.
- * Se não encontrar, retorna null.
- */
+
 export function useCoverArt(artist?: string, title?: string) {
 	const [artUrl, setArtUrl] = useState<string | null>(null);
 
@@ -21,10 +18,9 @@ export function useCoverArt(artist?: string, title?: string) {
 				timeout: 6000
 			})
 			.then((res) => {
+				console.log('RES => ', res.data);
 				const item = res.data?.results?.[0];
-				console.log('ITEM => ', item);
 				if (item?.artworkUrl100) {
-					// melhora resolução: 100x100 → 600x600
 					setArtUrl(item.artworkUrl100.replace('100x100', '600x600'));
 				} else {
 					setArtUrl(null);

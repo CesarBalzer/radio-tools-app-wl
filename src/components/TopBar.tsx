@@ -1,111 +1,113 @@
 // src/screens/player/components/TopBar.tsx
-import React, {useMemo, useCallback} from 'react';
+import React, {useMemo, useCallback, useState} from 'react';
 import {Image, Text, TouchableOpacity, View, StyleSheet} from 'react-native';
 import {useTheme} from '../theme/ThemeProvider';
 import {useCoverArt} from '../hooks/useCoverArt';
 import {Ionicons} from '@expo/vector-icons';
 import {readableOn, rgbaFromFg} from '../utils/format';
-import {useRemoteConfigControls} from '../config/RemoteConfigProvider';
+import {ShareProps} from '../types';
+import {useItunesTrack} from '../hooks/useItunesTrack';
+import TrackModal from './TrackModal';
 
-// lista de tenants para ciclar no dev
-const TENANTS = ['cliente-aurora', 'cliente-radar', 'cliente-metro'] as const;
+export default function TopBar({name, genre, logoUrl, onShare, artist, title}: ShareProps) {
+	const theme = useTheme();
+	const fg = useMemo(() => readableOn(theme.colors.primary), [theme.colors.primary]);
+	const s = useMemo(() => styles(theme.colors.primary, fg), [theme.colors.primary, fg]);
 
-type Props = {
-  name: string;
-  genre: string;
-  logoUrl?: string;
-  onShare?: () => void;
-  artist?: string;
-  title?: string;
-};
+	const [modalVisible, setModalVisible] = useState(false);
 
-export default function TopBar({name, genre, logoUrl, onShare, artist, title}: Props) {
-  const theme = useTheme();
-  const {tenant, setTenant, refresh} = useRemoteConfigControls();
+	const {track: itunesTrack} = useItunesTrack(artist, title);
+	// console.log('TRACK => ', itunesTrack);
+	// Mantém sua estratégia de capa dedicada (pode preferir a do iTunes se quiser)
+	const coverUrl = useCoverArt(artist, title);
 
-  const fg = useMemo(() => readableOn(theme.colors.primary), [theme.colors.primary]);
-  const s = useMemo(() => styles(theme.colors.primary, fg), [theme.colors.primary, fg]);
+	const handleShare = useCallback(() => {
+		if (!onShare) return;
+		onShare({name, artist, title, logoUrl, coverUrl});
+	}, [onShare, name, artist, title, logoUrl, coverUrl]);
 
-  const coverUrl = useCoverArt(artist, title);
+	return (
+		<View style={s.topBar}>
+			<View style={s.left}>
+				{coverUrl ? (
+					<Image source={{uri: coverUrl}} style={s.cover} resizeMode="cover" />
+				) : logoUrl ? (
+					<Image source={{uri: logoUrl}} style={s.logo} resizeMode="contain" />
+				) : null}
 
-  const cycleTenant = useCallback(async () => {
-    const idx = TENANTS.indexOf(tenant as any);
-    const next = TENANTS[(idx >= 0 ? idx : 0) + 1 === TENANTS.length ? 0 : (idx >= 0 ? idx + 1 : 1)];
-    await setTenant(next);
+				<View style={s.textCol}>
+					<Text style={[s.name, {color: fg}]} numberOfLines={1} ellipsizeMode="tail">
+						{name}
+					</Text>
+					<Text style={[s.artist, {color: fg}]} numberOfLines={1} ellipsizeMode="tail">
+						{itunesTrack?.artistName}
+					</Text>
+					<Text style={[s.sub, {color: rgbaFromFg(fg as any, 0.95)}]} numberOfLines={1} ellipsizeMode="tail">
+						{genre}
+					</Text>
+				</View>
+			</View>
 
-  }, [tenant, setTenant]);
+			<View style={s.actions}>
+				{!!itunesTrack && (
+					<TouchableOpacity
+						onPress={() => setModalVisible(true)}
+						style={[s.iconBtn, {backgroundColor: rgbaFromFg(fg as any, 0.18)}]}
+						accessibilityRole="button"
+						accessibilityLabel="Ver detalhes da faixa"
+					>
+						<Ionicons name="information-circle-outline" size={22} color={fg} />
+					</TouchableOpacity>
+				)}
 
-  return (
-    <View style={s.topBar}>
-      <View style={s.left}>
-        {coverUrl ? (
-          <Image source={{uri: coverUrl}} style={s.cover} resizeMode="cover" />
-        ) : logoUrl ? (
-          <Image source={{uri: logoUrl}} style={s.logo} resizeMode="contain" />
-        ) : null}
+				{!!onShare && (
+					<TouchableOpacity
+						onPress={handleShare}
+						style={[s.iconBtn, {backgroundColor: rgbaFromFg(fg as any, 0.18)}]}
+						accessibilityRole="button"
+						accessibilityLabel="Compartilhar"
+					>
+						<Ionicons name="share-social" size={22} color={fg} />
+					</TouchableOpacity>
+				)}
+			</View>
 
-        <View style={{flexShrink: 1}}>
-          <Text style={[s.name, {color: fg}]} numberOfLines={1}>
-            {name}
-          </Text>
-          <Text style={[s.sub, {color: rgbaFromFg(fg as any, 0.95)}]} numberOfLines={1}>
-            {genre}
-          </Text>
-        </View>
-      </View>
-
-      <View style={s.actions}>
-        <TouchableOpacity
-          onPress={cycleTenant}
-          onLongPress={refresh}
-          delayLongPress={350}
-          activeOpacity={0.75}
-          style={[s.tenantBadge, {borderColor: fg, backgroundColor: rgbaFromFg(fg as any, 0.18)}]}
-        >
-          <Text style={[s.tenantTxt, {color: fg}]} numberOfLines={1}>
-            {tenant}
-          </Text>
-        </TouchableOpacity>
-
-        {!!onShare && (
-          <TouchableOpacity onPress={onShare} style={[s.iconBtn, {backgroundColor: rgbaFromFg(fg as any, 0.18)}]}>
-            <Ionicons name="share-social" size={22} color={fg} />
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
-  );
+			{/* Passe só o ItunesTrack para o modal */}
+			<TrackModal visible={modalVisible} onClose={() => setModalVisible(false)} track={itunesTrack ?? null} />
+		</View>
+	);
 }
 
 const styles = (primary: string, fg: string) =>
-  StyleSheet.create({
-    topBar: {
-      backgroundColor: primary,
-      paddingTop: 14,
-      paddingBottom: 10,
-      paddingHorizontal: 14,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    left: {flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1},
-    logo: {width: 34, height: 34, borderRadius: 8, backgroundColor: 'transparent'},
-    cover: {width: 44, height: 44, borderRadius: 8},
-    name: {fontSize: 16, fontWeight: '800', letterSpacing: 0.3, maxWidth: 220},
-    sub: {fontSize: 12, marginTop: 2},
-
-    actions: {flexDirection: 'row', alignItems: 'center', gap: 8},
-
-    tenantBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      borderRadius: 10,
-      borderWidth: 1,
-      minWidth: 60,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    tenantTxt: {fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5},
-
-    iconBtn: {paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10},
-  });
+	StyleSheet.create({
+		topBar: {
+			backgroundColor: primary,
+			paddingTop: 14,
+			paddingBottom: 10,
+			paddingHorizontal: 14,
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			borderBottomLeftRadius: 10,
+			borderBottomRightRadius: 10
+		},
+		left: {flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0},
+		textCol: {flex: 1, minWidth: 0},
+		logo: {width: 50, height: 50, borderRadius: 8, backgroundColor: 'transparent'},
+		cover: {width: 50, height: 50, borderRadius: 8},
+		name: {fontSize: 16, fontWeight: '800', letterSpacing: 0.3, flexShrink: 1},
+		artist: {fontSize: 14, fontWeight: '500', fontStyle:'italic', letterSpacing: 0.3, flexShrink: 1},
+		sub: {fontSize: 12, marginTop: 2, flexShrink: 1},
+		actions: {flexDirection: 'row', alignItems: 'center', gap: 8},
+		tenantBadge: {
+			paddingHorizontal: 10,
+			paddingVertical: 6,
+			borderRadius: 10,
+			borderWidth: 1,
+			minWidth: 60,
+			alignItems: 'center',
+			justifyContent: 'center'
+		},
+		tenantTxt: {fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5},
+		iconBtn: {paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10}
+	});

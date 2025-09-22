@@ -1,6 +1,6 @@
 // src/screens/PlayerScreen.tsx
 import React, {useMemo} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Share} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useTheme, type Theme} from '../theme/ThemeProvider';
 import {useRemoteConfig} from '../config/RemoteConfigProvider';
@@ -22,11 +22,11 @@ export default function PlayerScreen() {
 		urls: [streams.radio.primaryUrl, ...(streams.radio.fallbackUrls || [])]
 	});
 
-const now = useNowPlaying({
-  playing: player.playing,
-  metadataUrl: streams.radio.metadataUrl,
-  streamUrl: player.currentUrl ?? streams.radio.primaryUrl
-});
+	const now = useNowPlaying({
+		playing: player.playing,
+		metadataUrl: streams.radio.metadataUrl,
+		streamUrl: player.currentUrl ?? streams.radio.primaryUrl
+	});
 
 	const placeholderHeroImages: string[] = [
 		'https://placehold.co/1200x1200/333/FFFFFF.png?text=Banner+Radio+1',
@@ -52,29 +52,30 @@ const now = useNowPlaying({
 			<View style={s.page}>
 				<TopBar
 					name={station?.name ?? 'Radio Tools'}
-					genre={
-						now.title || now.artist
-							? `${now.artist ? now.artist + ' — ' : ''}${now.title ?? ''}${now.elapsedSec > 0 ? `  •  ${mmss(now.elapsedSec)}` : ''}`
-							: station?.genre ?? 'Ao vivo agora'
-					}
+					genre={now.title || now.artist ? `${now.artist ? now.artist + ' — ' : ''}${now.title ?? ''}` : station?.genre ?? 'Ao vivo agora'}
 					logoUrl={station?.logoUrl}
 					artist={now.artist}
 					title={now.title}
-					onShare={() => player.share(station?.name, station?.shareUrl ?? player.currentUrl)}
+					onShare={({name, artist, title, logoUrl}) => {
+						const msg = [
+							artist && title ? `🎵 Tocando agora: ${artist} — ${title}` : null,
+							name ? `📻 Rádio: ${name}` : null,
+							station?.shareUrl ? `▶️ Ouça: ${station.shareUrl}` : null
+						]
+							.filter(Boolean)
+							.join('\n');
+
+						Share.share({message: msg}).catch(() => {});
+					}}
 				/>
 
 				<View style={s.content}>
 					<View style={[s.statusBar, {backgroundColor: theme.colors.primary}]}>
 						{player.loading ? (
-							<Text style={s.statusText}>Conectando ao stream…</Text>
-						) : player.error ? (
+							<Text style={s.statusText}>Conectando…</Text>
+						) : player.error && (
 							<Text style={s.statusText} numberOfLines={1}>
 								{player.error}
-							</Text>
-						) : (
-							<Text style={s.statusText} numberOfLines={1}>
-								{player.playing ? 'Tocando agora' : 'Pausado'} • {now.artist ? `${now.artist} — ` : ''}
-								{now.title ?? station?.name}
 							</Text>
 						)}
 					</View>
@@ -116,7 +117,7 @@ function createStyles(theme: Theme) {
 			borderBottomColor: 'rgba(0,0,0,0.12)'
 		},
 		statusText: {
-			color: '#000',
+			color: theme.colors.text,
 			fontSize: 13,
 			fontWeight: '600'
 		},

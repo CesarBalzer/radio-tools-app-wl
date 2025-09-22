@@ -41,7 +41,7 @@ function AppMain() {
   return (
     <NavigationContainer theme={theme.navigationTheme}>
       <Tab.Navigator
-        initialRouteName="Player"
+        initialRouteName="Rádio"
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: theme.colors.primary,
@@ -53,7 +53,7 @@ function AppMain() {
         }}
       >
         <Tab.Screen
-          name="Player"
+          name="Rádio"
           component={PlayerScreen}
           options={{
             tabBarIcon: ({ color, size, focused }) => (
