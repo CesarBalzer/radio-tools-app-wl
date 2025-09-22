@@ -22,6 +22,7 @@ export function useCoverArt(artist?: string, title?: string) {
 			})
 			.then((res) => {
 				const item = res.data?.results?.[0];
+				console.log('ITEM => ', item);
 				if (item?.artworkUrl100) {
 					// melhora resolução: 100x100 → 600x600
 					setArtUrl(item.artworkUrl100.replace('100x100', '600x600'));

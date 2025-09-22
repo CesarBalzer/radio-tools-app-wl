@@ -20,3 +20,13 @@ export function readableOn(hex: string) {
 
 export const rgbaFromFg = (fg: '#000000' | '#FFFFFF', a: number) =>
   fg === '#FFFFFF' ? `rgba(255,255,255,${a})` : `rgba(0,0,0,${a})`;
+
+
+export function withAlpha(hex: string, a: number) {
+  const h = hex.replace('#', '');
+  const to255 = (s: string) => parseInt(s.length === 1 ? s + s : s, 16);
+  const r = to255(h.length === 3 ? h[0] : h.slice(0, 2));
+  const g = to255(h.length === 3 ? h[1] : h.slice(2, 4));
+  const b = to255(h.length === 3 ? h[2] : h.slice(4, 6));
+  return `rgba(${r},${g},${b},${a})`;
+}

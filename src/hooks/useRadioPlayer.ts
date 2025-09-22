@@ -8,15 +8,12 @@ import TrackPlayer, {
 import {Share} from 'react-native';
 import {setupPlayer} from '../player/service';
 
-// ───────────────── helpers v5 ─────────────────
 type MaybePlaybackState = State | { state?: State } | undefined | null;
 
 function getStateValue(s: MaybePlaybackState): State | undefined {
-  // Se for string enum (State), retorna direto; se for objeto, pega .state
   return (typeof s === 'string' ? s : s?.state) as State | undefined;
 }
 
-// remove valores falsy do array de eventos
 function ev(...items: Array<Event | null | undefined | false>): Event[] {
   return items.filter((x): x is Event => x != null && x !== false);
 }
@@ -26,23 +23,23 @@ type Args = { urls: string[]; label: string };
 async function waitForPlaying(ms: number) {
   const end = Date.now() + ms;
   while (Date.now() < end) {
-    const s = await TrackPlayer.getPlaybackState(); // v5
+    const s = await TrackPlayer.getPlaybackState();
     if (getStateValue(s) === State.Playing) return true;
-    await new Promise((r) => setTimeout(r, 250));
+    await new Promise(r => setTimeout(r, 250));
   }
   return false;
 }
 
 async function tryPlay(url: string, label: string) {
   await TrackPlayer.reset();
-  await TrackPlayer.add({ id: 'radio', url, title: label });
+  await TrackPlayer.add({id: 'radio', url, title: label});
   await TrackPlayer.play();
   const ok = await waitForPlaying(7000);
   if (!ok) throw new Error('timeout starting stream');
 }
 
-export function useRadioPlayer({ urls, label }: Args) {
-  const rawPlaybackState = usePlaybackState(); // pode ser State OU {state?: State}
+export function useRadioPlayer({urls, label}: Args) {
+  const rawPlaybackState = usePlaybackState();
   const [loading, setLoading] = useState(true);
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +55,6 @@ export function useRadioPlayer({ urls, label }: Args) {
   const playing = state === State.Playing;
   const isBuffering = state === State.Buffering;
 
-  // eventos válidos da v5 (sem valores vazios)
   useTrackPlayerEvents(
     ev(
       Event.PlaybackState,
@@ -69,13 +65,9 @@ export function useRadioPlayer({ urls, label }: Args) {
       Event.RemotePause,
       Event.RemoteStop,
       Event.RemoteDuck,
-      Event.RemotePlayPause,
-      // metadados (apenas se seu stream expõe ICY/ID3)
-      Event.MetadataCommonReceived,
-      Event.MetadataTimedReceived,
-      Event.MetadataChapterReceived,
+      Event.RemotePlayPause
     ),
-    (e) => {
+    e => {
       if (e.type === Event.PlaybackError) {
         setError(e.message ?? 'Erro de reprodução.');
       }
@@ -96,7 +88,6 @@ export function useRadioPlayer({ urls, label }: Args) {
         setLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startWithFallbacks = useCallback(async () => {
@@ -119,19 +110,17 @@ export function useRadioPlayer({ urls, label }: Args) {
   }, [urls, label]);
 
   const togglePlay = useCallback(async () => {
-    const s = await TrackPlayer.getPlaybackState(); // v5
+    const s = await TrackPlayer.getPlaybackState();
     const curr = getStateValue(s);
     if (curr === State.Playing) {
       await TrackPlayer.pause();
       return;
     }
-
     const queue = await TrackPlayer.getQueue().catch(() => []);
     if (queue && queue.length > 0 && currentUrl) {
       await TrackPlayer.play();
       return;
     }
-
     setLoading(true);
     try {
       await startWithFallbacks();
@@ -150,7 +139,7 @@ export function useRadioPlayer({ urls, label }: Args) {
 
   const share = useCallback(async (name?: string, url?: string | null) => {
     try {
-      await Share.share({ message: `${name ?? 'Minha Rádio'} — ouça agora: ${url ?? ''}` });
+      await Share.share({message: `${name ?? 'Minha Rádio'} — ouça agora: ${url ?? ''}`});
     } catch {}
   }, []);
 
@@ -165,7 +154,7 @@ export function useRadioPlayer({ urls, label }: Args) {
       isBuffering,
       togglePlay,
       stop,
-      share,
+      share
     }),
     [loading, error, currentUrl, volume, setVolume, playing, isBuffering, togglePlay, stop, share]
   );

@@ -32,7 +32,7 @@ export default function TopBar({name, genre, logoUrl, onShare, artist, title}: P
     const idx = TENANTS.indexOf(tenant as any);
     const next = TENANTS[(idx >= 0 ? idx : 0) + 1 === TENANTS.length ? 0 : (idx >= 0 ? idx + 1 : 1)];
     await setTenant(next);
-    // não precisa chamar refresh(); o provider já baixa ao trocar o tenant
+
   }, [tenant, setTenant]);
 
   return (
@@ -55,9 +55,6 @@ export default function TopBar({name, genre, logoUrl, onShare, artist, title}: P
       </View>
 
       <View style={s.actions}>
-        {/* badge do tenant:
-            - tap: alterna entre os 3
-            - long-press: força refresh do atual */}
         <TouchableOpacity
           onPress={cycleTenant}
           onLongPress={refresh}

@@ -2,18 +2,10 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {ImageBackground, ScrollView, Text, View, StyleSheet, useWindowDimensions} from 'react-native';
 import {useTheme, type Theme} from '../theme/ThemeProvider';
+import { withAlpha } from '../utils/format';
 
 type Partner = {imageUrl: string; title?: string; href?: string};
 type Props = {partners: Partner[]; showDots?: boolean};
-
-function withAlpha(hex: string, a: number) {
-  const h = hex.replace('#', '');
-  const to255 = (s: string) => parseInt(s, 16);
-  const r = h.length === 3 ? to255(h[0] + h[0]) : to255(h.slice(0, 2));
-  const g = h.length === 3 ? to255(h[1] + h[1]) : to255(h.slice(2, 4));
-  const b = h.length === 3 ? to255(h[2] + h[2]) : to255(h.slice(4, 6));
-  return `rgba(${r},${g},${b},${a})`;
-}
 
 const RADIUS = 10;
 

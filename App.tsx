@@ -4,20 +4,18 @@ import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-
 import { ThemeProvider, useTheme as useAppTheme } from './src/theme/ThemeProvider';
 import { useRemoteConfigProvider } from './src/config/RemoteConfigProvider';
-
 import PlayerScreen from './src/screens/PlayerScreen';
 import LiveScreen from './src/screens/LiveScreen';
 import PromosScreen from './src/screens/PromosScreen';
+import { Ionicons } from '@expo/vector-icons';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-  // carrega a remote config antes da UI
   const { isReady, ConfigProvider } = useRemoteConfigProvider();
 
   useEffect(() => {
@@ -54,9 +52,33 @@ function AppMain() {
           },
         }}
       >
-        <Tab.Screen name="Player" component={PlayerScreen} />
-        <Tab.Screen name="Live" component={LiveScreen} />
-        <Tab.Screen name="Promos" component={PromosScreen} />
+        <Tab.Screen
+          name="Player"
+          component={PlayerScreen}
+          options={{
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? 'play-circle' : 'play-circle-outline'} color={color} size={size ?? 22} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Live"
+          component={LiveScreen}
+          options={{
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? 'videocam' : 'videocam-outline'} color={color} size={size ?? 22} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Promos"
+          component={PromosScreen}
+          options={{
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? 'pricetags' : 'pricetags-outline'} color={color} size={size ?? 22} />
+            ),
+          }}
+        />
       </Tab.Navigator>
 
       <StatusBar style={theme.statusBarStyle} />

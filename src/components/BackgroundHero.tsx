@@ -2,6 +2,7 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {View, ImageBackground, StyleSheet, Animated, Easing} from 'react-native';
 import {useTheme} from '../theme/ThemeProvider';
+import { withAlpha } from '../utils/format';
 
 type Props = {
   images: string[];
@@ -10,15 +11,6 @@ type Props = {
   primaryTintOpacity?: number;
   overlayOpacity?: number;
 };
-
-function withAlpha(hex: string, a: number) {
-  const h = hex.replace('#', '');
-  const to255 = (s: string) => parseInt(s.length === 1 ? s + s : s, 16);
-  const r = to255(h.length === 3 ? h[0] : h.slice(0, 2));
-  const g = to255(h.length === 3 ? h[1] : h.slice(2, 4));
-  const b = to255(h.length === 3 ? h[2] : h.slice(4, 6));
-  return `rgba(${r},${g},${b},${a})`;
-}
 
 export default function BackgroundHero({
   images,
