@@ -1514,13 +1514,13 @@
     ws "^6.2.3"
 
 "@react-native/eslint-config@^0.73.3":
-  version "0.83.0-nightly-20250921-a4d43290c"
-  resolved "https://registry.yarnpkg.com/@react-native/eslint-config/-/eslint-config-0.83.0-nightly-20250921-a4d43290c.tgz#eb57f31128da6565a1f09fcf27323e87f54e5ac9"
-  integrity sha512-FW36dETdB9zzoMYDSD9Enbb09fAerlDMdTpftlxQHToBXKB5JfHn1t3V5JR7r8sXXsl5pMYDaGtCABmB2DsvLQ==
+  version "0.83.0-nightly-20250922-5ef054921"
+  resolved "https://registry.yarnpkg.com/@react-native/eslint-config/-/eslint-config-0.83.0-nightly-20250922-5ef054921.tgz#08e630e6ce205aa670978cb782fe39e9a1f56989"
+  integrity sha512-gB1bdFJXIlBsGCgSW4jG7qfVafkz+3ahcvW5nfO4oJw4hpQw4E8o53cXDG2k5bGITBPf+t5yZAWxP4kqKUEpkw==
   dependencies:
     "@babel/core" "^7.25.2"
     "@babel/eslint-parser" "^7.25.1"
-    "@react-native/eslint-plugin" "0.83.0-nightly-20250921-a4d43290c"
+    "@react-native/eslint-plugin" "0.83.0-nightly-20250922-5ef054921"
     "@typescript-eslint/eslint-plugin" "^8.36.0"
     "@typescript-eslint/parser" "^8.36.0"
     eslint-config-prettier "^8.5.0"
@@ -1531,10 +1531,10 @@
     eslint-plugin-react-hooks "^5.2.0"
     eslint-plugin-react-native "^4.0.0"
 
-"@react-native/eslint-plugin@0.83.0-nightly-20250921-a4d43290c":
-  version "0.83.0-nightly-20250921-a4d43290c"
-  resolved "https://registry.yarnpkg.com/@react-native/eslint-plugin/-/eslint-plugin-0.83.0-nightly-20250921-a4d43290c.tgz#c4d9be32634debcd29af3690c575dc6803433a33"
-  integrity sha512-2IpOEt8XvI/heiPnLpzxT+QgaA0OjGyAqDxgosZtJM1/Imh0nmYPYy5ZkZometpdnl0YaB8rSUfAitJueHzeVg==
+"@react-native/eslint-plugin@0.83.0-nightly-20250922-5ef054921":
+  version "0.83.0-nightly-20250922-5ef054921"
+  resolved "https://registry.yarnpkg.com/@react-native/eslint-plugin/-/eslint-plugin-0.83.0-nightly-20250922-5ef054921.tgz#3d730f7c78bcdcff81da542940051ff901ee0737"
+  integrity sha512-ZmR9xxLQeVNb8p8rvfh/mnMvDGAD5nEfXwqChE1/FfAqbHT0kOEExy+dpHC3ooQec36XSslo9mhAjIrN14cgmQ==
 
 "@react-native/gradle-plugin@0.81.4":
   version "0.81.4"
@@ -3239,6 +3239,11 @@ expo-asset@~12.0.9:
     "@expo/image-utils" "^0.8.7"
     expo-constants "~18.0.9"
 
+expo-clipboard@^8.0.7:
+  version "8.0.7"
+  resolved "https://registry.yarnpkg.com/expo-clipboard/-/expo-clipboard-8.0.7.tgz#f81d279036408bbe074ef748623e1ae6f170d391"
+  integrity sha512-zvlfFV+wB2QQrQnHWlo0EKHAkdi2tycLtE+EXFUWTPZYkgu1XcH+aiKfd4ul7Z0SDF+1IuwoiW9AA9eO35aj3Q==
+
 expo-constants@~18.0.9:
   version "18.0.9"
   resolved "https://registry.yarnpkg.com/expo-constants/-/expo-constants-18.0.9.tgz#fcaf37e97ea2b928bd3b92f2ea9836984ab6e48b"
@@ -3282,6 +3287,15 @@ expo-modules-core@3.0.17:
   integrity sha512-P1jZn8yjWi4jSCH+r9A1NykLR+0JtFYprJgYwnZ1EVFRtw+DoMjir0OexM9ehCuBg8sKDCbzCUAgm/JFnpjQww==
   dependencies:
     invariant "^2.2.4"
+
+expo-navigation-bar@^5.0.8:
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/expo-navigation-bar/-/expo-navigation-bar-5.0.8.tgz#55520d92121e70b2d92dc9f8cbce3996be853e66"
+  integrity sha512-vaUkedxWscne24NIoADncgjP4WYKNdy69mSO9UWNRlOGdmzyswI4h16xuiNjlbTOxzHMVPotGWyMNxo5gxkxpg==
+  dependencies:
+    "@react-native/normalize-colors" "0.81.4"
+    debug "^4.3.2"
+    react-native-is-edge-to-edge "^1.2.1"
 
 expo-screen-orientation@~9.0.7:
   version "9.0.7"

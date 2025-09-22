@@ -70,15 +70,21 @@ export default function PlayerScreen() {
 				/>
 
 				<View style={s.content}>
-					<View style={[s.statusBar, {backgroundColor: theme.colors.primary}]}>
-						{player.loading ? (
-							<Text style={s.statusText}>Conectando…</Text>
-						) : player.error && (
-							<Text style={s.statusText} numberOfLines={1}>
-								{player.error}
-							</Text>
-						)}
-					</View>
+          
+					{(player && player.loading) ||
+						(player.error && (
+							<View style={[s.statusBar, {backgroundColor: theme.colors.primary}]}>
+								{player.loading ? (
+									<Text style={s.statusText}>Conectando…</Text>
+								) : (
+									player.error && (
+										<Text style={s.statusText} numberOfLines={1}>
+											{player.error}
+										</Text>
+									)
+								)}
+							</View>
+						))}
 
 					<View style={s.heroWrap}>
 						<BackgroundHero images={heroImages} />
@@ -109,12 +115,14 @@ function createStyles(theme: Theme) {
 		page: {flex: 1, backgroundColor: 'transparent'},
 		content: {flex: 1},
 		statusBar: {
-			// paddingVertical: 6,
+			marginTop: 10,
+			paddingVertical: 2,
 			alignItems: 'center',
 			justifyContent: 'center',
 			paddingHorizontal: 12,
 			borderBottomWidth: StyleSheet.hairlineWidth,
-			borderBottomColor: 'rgba(0,0,0,0.12)'
+			borderBottomColor: 'rgba(0,0,0,0.12)',
+			borderRadius: 10
 		},
 		statusText: {
 			color: theme.colors.text,
@@ -128,7 +136,7 @@ function createStyles(theme: Theme) {
 		},
 		partnersWrap: {},
 		controlsWrap: {
-			paddingVertical: 10
+			paddingTop: 10
 		}
 	});
 }

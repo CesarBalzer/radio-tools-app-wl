@@ -22,7 +22,7 @@ export type Theme = {
 
 const DEFAULTS = {
   primary: '#ACF44E',
-  background: '#333333',
+  background: '#212121',
   text: '#FFFFFF',
   mutedDark: '#A0A0A0',
   mutedLight: '#4A4A4A',

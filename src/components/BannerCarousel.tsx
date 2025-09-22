@@ -25,7 +25,7 @@ export default function BannerCarousel({partners, showDots = true}: Props) {
         scrollRef.current?.scrollTo({x: next * width, animated: true});
         return next;
       });
-    }, 3500);
+    }, 5000);
     return () => clearInterval(id);
   }, [list.length, width]);
 
