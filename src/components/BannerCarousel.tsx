@@ -1,36 +1,77 @@
 // src/components/BannerCarousel.tsx
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {ImageBackground, ScrollView, Text, View, StyleSheet, useWindowDimensions} from 'react-native';
+import {
+  ImageBackground,
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  useWindowDimensions,
+  AccessibilityInfo,
+  Pressable,
+  Linking,
+} from 'react-native';
 import {useTheme, type Theme} from '../theme/ThemeProvider';
-import { withAlpha } from '../utils/format';
+import {withAlpha} from '../utils/format';
 
-type Partner = {imageUrl: string; title?: string; href?: string};
-type Props = {partners: Partner[]; showDots?: boolean};
+type Partner = { imageUrl: string; title?: string; href?: string };
+type Props = { partners: Partner[]; showDots?: boolean };
 
 const RADIUS = 10;
 
-export default function BannerCarousel({partners, showDots = true}: Props) {
+export default function BannerCarousel({ partners, showDots = true }: Props) {
   const theme = useTheme();
-  const {width} = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const s = styles(theme);
   const scrollRef = useRef<ScrollView>(null);
   const list = useMemo(() => partners ?? [], [partners]);
-  const [index, setIndex] = useState(0);
 
+  const [index, setIndex] = useState(0);
+  const [screenReaderOn, setScreenReaderOn] = useState(false);
+  const [interacting, setInteracting] = useState(false);
+
+  // Detecta leitor de tela para pausar autoplay
   useEffect(() => {
-    if (!list.length) return;
+    let mounted = true;
+    AccessibilityInfo.isScreenReaderEnabled()
+      .then(enabled => mounted && setScreenReaderOn(Boolean(enabled)))
+      .catch(() => {});
+    const sub = AccessibilityInfo.addEventListener?.('screenReaderChanged', enabled => {
+      setScreenReaderOn(Boolean(enabled));
+    });
+    return () => {
+      sub?.remove?.();
+      mounted = false;
+    };
+  }, []);
+
+  // Autoplay: pausa se leitor de tela estiver ativo ou se usuário estiver interagindo
+  useEffect(() => {
+    if (!list.length || screenReaderOn || interacting) return;
     const id = setInterval(() => {
       setIndex(i => {
         const next = (i + 1) % list.length;
-        scrollRef.current?.scrollTo({x: next * width, animated: true});
+        scrollRef.current?.scrollTo({ x: next * width, animated: true });
         return next;
       });
     }, 5000);
     return () => clearInterval(id);
-  }, [list.length, width]);
+  }, [list.length, width, screenReaderOn, interacting]);
+
+  const onDotPress = (i: number) => {
+    setIndex(i);
+    scrollRef.current?.scrollTo({ x: i * width, animated: true });
+  };
+
+  const openLink = async (href?: string) => {
+    if (!href) return;
+    try {
+      await Linking.openURL(href);
+    } catch {}
+  };
 
   return (
-    <View>
+    <View accessibilityLabel={`Carrossel de banners com ${list.length || 0} itens.`}>
       {list.length ? (
         <>
           <ScrollView
@@ -43,42 +84,81 @@ export default function BannerCarousel({partners, showDots = true}: Props) {
               if (i !== index) setIndex(i);
             }}
             scrollEventThrottle={16}
+            onTouchStart={() => setInteracting(true)}
+            onTouchEnd={() => setInteracting(false)}
+            onScrollBeginDrag={() => setInteracting(true)}
+            onScrollEndDrag={() => setInteracting(false)}
+            accessibilityRole="scrollbar"
+            accessibilityLabel="Banners de parceiros. Deslize para ver mais."
           >
-            {list.map((b, idx) => (
-              <ImageBackground
-                key={idx}
-                source={{uri: b.imageUrl}}
-                style={[s.banner, {width}]}
-                imageStyle={s.bannerImg}
-              >
-                <View style={s.overlay} />
-                {b.title ? (
-                  <View style={s.titleWrap}>
-                    <Text style={s.title}>{b.title}</Text>
-                  </View>
-                ) : null}
-              </ImageBackground>
-            ))}
+            {list.map((b, idx) => {
+              const labelBase = b.title?.trim() || `Banner ${idx + 1} de ${list.length}`;
+              const a11yLabel = b.href ? `${labelBase}. Abre link do parceiro.` : labelBase;
+
+              return (
+                <Pressable
+                  key={idx}
+                  onPress={() => openLink(b.href)}
+                  disabled={!b.href}
+                  style={{ width }}
+                  accessibilityRole={b.href ? 'link' : 'image'}
+                  accessibilityLabel={a11yLabel}
+                  accessibilityHint={b.href ? 'Duplo toque para abrir.' : undefined}
+                >
+                  <ImageBackground
+                    source={{ uri: b.imageUrl }}
+                    style={[s.banner]}
+                    imageStyle={s.bannerImg}
+                    // a imagem é puramente visual; o Pressable acima cuida da a11y
+                    accessible={false}
+                    importantForAccessibility="no-hide-descendants"
+                  >
+                    <View style={s.overlay} />
+                    {b.title ? (
+                      <View style={s.titleWrap}>
+                        <Text style={s.title} allowFontScaling numberOfLines={2}>
+                          {b.title}
+                        </Text>
+                      </View>
+                    ) : null}
+                  </ImageBackground>
+                </Pressable>
+              );
+            })}
           </ScrollView>
 
           {showDots ? (
-            <View style={s.dots}>
+            <View style={s.dots} accessibilityLabel="Indicadores do carrossel">
               {list.map((_, i) => (
-                <View
+                <Pressable
                   key={i}
-                  style={[
-                    s.dot,
-                    {backgroundColor: i === index ? theme.colors.text : withAlpha(theme.colors.text, 0.28)},
-                  ]}
-                />
+                  onPress={() => onDotPress(i)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Ir para o slide ${i + 1} de ${list.length}`}
+                  accessibilityState={{ selected: i === index }}
+                >
+                  <View
+                    style={[
+                      s.dot,
+                      {
+                        backgroundColor:
+                          i === index ? theme.colors.text : withAlpha(theme.colors.text, 0.28),
+                      },
+                    ]}
+                  />
+                </Pressable>
               ))}
             </View>
           ) : null}
         </>
       ) : (
-        <View style={[s.fallback, {width}]}>
-          <Text style={s.fallbackTxt}>RADIO TOOLS</Text>
-          <Text style={s.fallbackSub}>Mobile Apps & Websites</Text>
+        <View style={[s.fallback, { width }]} accessibilityRole="summary" accessibilityLabel="Área de parceiros">
+          <Text style={s.fallbackTxt} allowFontScaling numberOfLines={1}>
+            RADIO TOOLS
+          </Text>
+          <Text style={s.fallbackSub} allowFontScaling numberOfLines={1}>
+            Mobile Apps & Websites
+          </Text>
         </View>
       )}
     </View>
@@ -87,9 +167,17 @@ export default function BannerCarousel({partners, showDots = true}: Props) {
 
 const styles = (t: Theme) =>
   StyleSheet.create({
-    banner: {height: 180, justifyContent: 'center', alignItems: 'center'},
-    bannerImg: {resizeMode: 'cover', borderRadius: RADIUS, backgroundColor: withAlpha(t.colors.primary, 0.2)},
-    overlay: {...StyleSheet.absoluteFillObject, borderRadius: RADIUS, backgroundColor: withAlpha(t.colors.background, 0.28)},
+    banner: { height: 180, justifyContent: 'center', alignItems: 'center' },
+    bannerImg: {
+      resizeMode: 'cover',
+      borderRadius: RADIUS,
+      backgroundColor: withAlpha(t.colors.primary, 0.2),
+    },
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: RADIUS,
+      backgroundColor: withAlpha(t.colors.background, 0.28),
+    },
     titleWrap: {
       paddingHorizontal: 20,
       paddingVertical: 10,
@@ -98,7 +186,7 @@ const styles = (t: Theme) =>
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: t.colors.border,
     },
-    title: {fontWeight: '900', fontSize: 18, letterSpacing: 0.5, color: t.colors.text},
+    title: { fontWeight: '900', fontSize: 18, letterSpacing: 0.5, color: t.colors.text },
 
     fallback: {
       height: 260,
@@ -111,7 +199,7 @@ const styles = (t: Theme) =>
       borderColor: t.colors.border,
       backgroundColor: t.colors.card,
     },
-    fallbackTxt: {fontSize: 34, fontWeight: '900', letterSpacing: 1, color: t.colors.text},
+    fallbackTxt: { fontSize: 34, fontWeight: '900', letterSpacing: 1, color: t.colors.text },
     fallbackSub: {
       marginTop: 10,
       paddingHorizontal: 16,
@@ -122,6 +210,6 @@ const styles = (t: Theme) =>
       color: t.colors.text,
     },
 
-    dots: {flexDirection: 'row', alignSelf: 'center', marginTop: 10, gap: 6},
-    dot: {width: 7, height: 7, borderRadius: 10},
+    dots: { flexDirection: 'row', alignSelf: 'center', marginTop: 10, gap: 10 },
+    dot: { width: 10, height: 10, borderRadius: 12 },
   });
