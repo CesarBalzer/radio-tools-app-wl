@@ -81,3 +81,15 @@ export type ShareProps = {
 	artist?: string;
 	title?: string;
 };
+
+export type SocialMap = {
+	website?: string;
+	instagram?: string;
+	facebook?: string;
+	youtube?: string;
+	tiktok?: string;
+	twitter?: string;
+	x?: string;
+	whatsapp?: string;
+	telegram?: string;
+};
