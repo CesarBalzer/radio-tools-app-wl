@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import type {RemoteConfig} from '../types';
+import {LOCAL_CONFIGS} from './localConfigs';
 
 const DEFAULT_CONFIG: RemoteConfig = {
 	version: 1,
@@ -29,6 +30,7 @@ function getExtra(): any {
 	// expo-dev: expoConfig.extra; EAS runtime: manifestExtra
 	return (Constants as any)?.expoConfig?.extra ?? (Constants as any)?.manifestExtra ?? {};
 }
+
 function buildRemoteUrl(extra: any, tenant: string): string | undefined {
 	const tpl = extra?.REMOTE_CONFIG_URL_TEMPLATE as string | undefined;
 	if (tpl) return String(tpl).replace('{tenant}', tenant);
@@ -64,7 +66,7 @@ function sanitizeConfig(input: any): RemoteConfig {
 					? {
 							primaryUrl: String(input.streams.video.primaryUrl),
 							fallbackUrls: Array.isArray(input.streams.video?.fallbackUrls) ? input.streams.video.fallbackUrls : []
-					  }
+						}
 					: undefined
 			},
 			station: Array.isArray(input?.station?.partners)
@@ -106,17 +108,36 @@ export function useRemoteConfigProvider() {
 		const extra = getExtra();
 		const url = buildRemoteUrl(extra, t);
 		if (!url) throw new Error('REMOTE_CONFIG_URL ausente');
+
+		// se não começar com http, tratamos como config local
+		if (!url.startsWith('http')) {
+			const localCfg = LOCAL_CONFIGS[t];
+			if (!localCfg) {
+				throw new Error(`Config local não encontrada para tenant "${t}"`);
+			}
+
+			const parsed = sanitizeConfig(localCfg);
+			setConfig(parsed);
+			await AsyncStorage.setItem(`${KEY_BASE}:${t}`, JSON.stringify(parsed));
+			return {updated: true as const};
+		}
+
+		// ---- RESTO IGUAL (remote via HTTP) ----
 		setCurrentUrl(url);
 
 		const etagKey = `${ETAG_KEY_BASE}:${t}`;
 		const prevEtag = await AsyncStorage.getItem(etagKey);
 
-		const headers = {} as Record<string, string>;
+		const headers: Record<string, string> = {};
 		if (prevEtag) headers['If-None-Match'] = prevEtag;
 
-		const doTry = async (attempt: number) => {
+		const doTry = async (attempt: number): Promise<{updated: boolean}> => {
 			try {
-				const resp = await axios.get(url, {timeout: 7000, headers});
+				const resp = await axios.get(url, {
+					timeout: 7000,
+					headers,
+					validateStatus: (status) => status === 200 || status === 304
+				});
 				if (resp.status === 304) return {updated: false as const};
 				const parsed = sanitizeConfig(resp.data);
 				setConfig(parsed);

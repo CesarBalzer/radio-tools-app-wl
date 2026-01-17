@@ -8,12 +8,13 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider, useTheme as useAppTheme } from './src/theme/ThemeProvider';
 import { useRemoteConfigProvider } from './src/config/RemoteConfigProvider';
-import { useRemoteConfig } from './src/config/RemoteConfigProvider'; // se já exporta esse hook
+import { useRemoteConfig } from './src/config/RemoteConfigProvider'; 
 import PlayerScreen from './src/screens/PlayerScreen';
 import LiveScreen from './src/screens/LiveScreen';
 import PromosScreen from './src/screens/PromosScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { luminanceOf } from './src/utils/format';
+import { useConfigAutoRefresh } from './src/hooks/useConfigAutoRefresh';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -120,6 +121,8 @@ export default function App() {
 function AppMain() {
   const theme = useAppTheme();
   useAndroidNavBarTheming();
+
+  useConfigAutoRefresh();
 
   return (
     <NavigationContainer theme={theme.navigationTheme}>

@@ -9,10 +9,10 @@ import {useRadioPlayer} from '../hooks/useRadioPlayer';
 import TopBar from '../components/TopBar';
 import BannerCarousel from '../components/BannerCarousel';
 import Controls from '../components/Controls';
-import {mmss} from '../utils/format';
 import BackgroundHero from '../components/BackgroundHero';
 import {useNowPlaying} from '../hooks/useNowPlaying';
 import SocialLinks from '../components/SocialLinks';
+import TenantSwitcher from '../components/TenantSwitcher';
 
 export default function PlayerScreen() {
 	const theme = useTheme();
@@ -29,10 +29,8 @@ export default function PlayerScreen() {
 		streamUrl: player.currentUrl ?? streams.radio.primaryUrl
 	});
 
-	// ── Anúncios de acessibilidade ────────────────────────────────────────────────
 	const lastAnnouncedRef = useRef<string | null>(null);
 
-	// Estado de conexão/erro
 	useEffect(() => {
 		if (player.loading) {
 			AccessibilityInfo.announceForAccessibility('Conectando ao áudio…');
@@ -41,11 +39,9 @@ export default function PlayerScreen() {
 		}
 	}, [player.loading, player.error]);
 
-	// Agora tocando (evita repetir o mesmo anúncio)
 	useEffect(() => {
 		const line = [now?.artist, now?.title].filter(Boolean).join(' — ');
 		if (!line) return;
-
 		const msg = `Agora tocando: ${line}`;
 		if (lastAnnouncedRef.current !== msg) {
 			AccessibilityInfo.announceForAccessibility(msg);
@@ -72,11 +68,22 @@ export default function PlayerScreen() {
 
 	const s = useMemo(() => createStyles(theme), [theme]);
 
+	const handleShare = () => {
+		const msg = [
+			now?.artist && now?.title ? `🎵 Tocando agora: ${now.artist} — ${now.title}` : null,
+			station?.name ? `📻 Rádio: ${station.name}` : null,
+			station?.shareUrl ? `▶️ Ouça: ${station.shareUrl}` : null
+		]
+			.filter(Boolean)
+			.join('\n');
+
+		Share.share({message: msg}).catch(() => {});
+	};
+
 	return (
 		<SafeAreaView
 			edges={['top']}
 			style={[s.root, {backgroundColor: theme.colors.background}]}
-			// A tela inteira é uma região principal
 			accessibilityRole="summary"
 			accessibilityLabel="Tela principal. Rádio ao vivo."
 		>
@@ -87,22 +94,22 @@ export default function PlayerScreen() {
 					logoUrl={station?.logoUrl}
 					artist={now.artist}
 					title={now.title}
-					onShare={({name, artist, title, logoUrl}) => {
-						const msg = [
-							artist && title ? `🎵 Tocando agora: ${artist} — ${title}` : null,
-							name ? `📻 Rádio: ${name}` : null,
-							station?.shareUrl ? `▶️ Ouça: ${station.shareUrl}` : null
-						]
-							.filter(Boolean)
-							.join('\n');
-
-						Share.share({message: msg}).catch(() => {});
-					}}
 				/>
 
+				<View style={s.controlsWrap} accessibilityLabel="Controles do player">
+					<Controls
+						volume={player.volume}
+						setVolume={player.setVolume}
+						playing={player.playing}
+						onTogglePlay={player.togglePlay}
+						onShare={handleShare}
+						artist={now?.artist ?? undefined}
+						title={now?.title ?? undefined}
+					/>
+				</View>
+
 				<View style={s.content}>
-					{/* Barra de status: lida como texto e atualiza dinamicamente */}
-					{player && (player.loading || player.error) && (
+					{(player.loading || player.error) && (
 						<View
 							style={[s.statusBar, {backgroundColor: theme.colors.primary}]}
 							accessibilityRole="text"
@@ -121,6 +128,8 @@ export default function PlayerScreen() {
 						</View>
 					)}
 
+					{/* <TenantSwitcher /> */}
+
 					<View style={s.heroWrap} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
 						<BackgroundHero images={heroImages} />
 					</View>
@@ -130,16 +139,6 @@ export default function PlayerScreen() {
 					<View style={s.partnersWrap} accessibilityRole="summary" accessibilityLabel="Patrocinadores e parceiros">
 						<BannerCarousel partners={station?.partners ?? []} showDots={false} />
 					</View>
-				</View>
-
-				<View style={[s.controlsWrap]} accessibilityLabel="Controles do player">
-					<Controls
-						volume={player.volume}
-						setVolume={player.setVolume}
-						playing={player.playing}
-						onTogglePlay={player.togglePlay}
-						onShare={() => player.share(station?.name, station?.shareUrl ?? player.currentUrl)}
-					/>
 				</View>
 			</View>
 		</SafeAreaView>
@@ -175,7 +174,7 @@ function createStyles(theme: Theme) {
 			// espaço para banners
 		},
 		controlsWrap: {
-			paddingTop: 10
+			// estilizações extras se quiser colar nos elementos abaixo
 		}
 	});
 }
